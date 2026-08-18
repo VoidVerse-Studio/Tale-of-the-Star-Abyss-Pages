@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#11100d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>星渊引 · Unity V63</title>
+  <style>
+    :root { color-scheme: dark; background: #11100d; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; }
+    body { position: fixed; inset: 0; background: #11100d; font-family: "Songti SC", "Noto Serif SC", serif; touch-action: none; }
+    #unity-container { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; background: #11100d; }
+    #unity-canvas { display: block; width: 100%; height: 100%; background: #11100d; outline: none; }
+    #loading, #enter, #error, #rotate-hint { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; }
+    #loading { flex-direction: column; gap: 18px; color: #e8d8b5; background: #11100d; }
+    #loading-title { letter-spacing: .28em; font-size: 22px; }
+    #progress-track { width: min(68vw, 320px); height: 3px; overflow: hidden; background: rgba(232,216,181,.18); }
+    #progress-bar { width: 0; height: 100%; background: #b78b45; transition: width .12s linear; }
+    #progress-text { color: rgba(232,216,181,.62); font-size: 13px; letter-spacing: .12em; }
+    #enter { display: none; background: rgba(10,9,7,.58); backdrop-filter: blur(3px); }
+    #enter-button { min-width: 190px; padding: 15px 28px; border: 1px solid rgba(216,179,103,.8); border-radius: 2px; color: #f2e5c8; background: rgba(43,52,38,.94); font: inherit; font-size: 17px; letter-spacing: .18em; }
+    #error { display: none; padding: 28px; color: #f1dfc1; background: #17120f; text-align: center; line-height: 1.7; touch-action: auto; }
+    #rotate-hint { display: none; z-index: 20; padding: 24px; color: #ead8b7; background: rgba(17,16,13,.96); text-align: center; letter-spacing: .12em; }
+    @media (orientation: landscape) and (max-height: 600px) { #rotate-hint { display: flex; } }
+  </style>
+</head>
+<body>
+  <main id="unity-container">
+    <canvas id="unity-canvas" width="540" height="960" tabindex="-1"></canvas>
+  </main>
+  <section id="loading" aria-live="polite">
+    <div id="loading-title">星渊引</div>
+    <div id="progress-track"><div id="progress-bar"></div></div>
+    <div id="progress-text">载入 Unity V63 · 0%</div>
+  </section>
+  <section id="enter"><button id="enter-button" type="button">轻触进入</button></section>
+  <section id="error"></section>
+  <aside id="rotate-hint">请将手机转回竖屏</aside>
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loading = document.querySelector("#loading");
+    const progressBar = document.querySelector("#progress-bar");
+    const progressText = document.querySelector("#progress-text");
+    const enter = document.querySelector("#enter");
+    const enterButton = document.querySelector("#enter-button");
+    const errorPanel = document.querySelector("#error");
+    const buildUrl = "Build";
+    const cacheVersion = new URLSearchParams(window.location.search).get("v") || "63.0.0";
+    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion);
+    const loaderUrl = buildUrl + "/StarAbyss-Unity-V63-WebGL.loader.js" + cacheSuffix;
+    const config = {
+      dataUrl: buildUrl + "/StarAbyss-Unity-V63-WebGL.data.unityweb" + cacheSuffix,
+      frameworkUrl: buildUrl + "/StarAbyss-Unity-V63-WebGL.framework.js.unityweb" + cacheSuffix,
+      codeUrl: buildUrl + "/StarAbyss-Unity-V63-WebGL.wasm.unityweb" + cacheSuffix,
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "VoidVerse Studio",
+      productName: "星渊引",
+      productVersion: "63.0.0",
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      matchWebGLToCanvasSize: true,
+      autoSyncPersistentDataPath: true,
+      showBanner: (message, type) => {
+        if (type === "error") showError(message);
+        else console.warn(message);
+      }
+    };
+
+    function showError(message) {
+      loading.style.display = "none";
+      enter.style.display = "none";
+      errorPanel.textContent = "Unity V63 载入失败。请刷新页面后重试。\n" + message;
+      errorPanel.style.display = "flex";
+    }
+
+    canvas.addEventListener("contextmenu", event => event.preventDefault());
+    canvas.addEventListener("touchmove", event => event.preventDefault(), { passive: false });
+
+    const loader = document.createElement("script");
+    loader.src = loaderUrl;
+    loader.onload = () => {
+      createUnityInstance(canvas, config, progress => {
+        const percent = Math.round(progress * 100);
+        progressBar.style.width = percent + "%";
+        progressText.textContent = "载入 Unity V63 · " + percent + "%";
+      }).then(unityInstance => {
+        loading.style.display = "none";
+        enter.style.display = "flex";
+        let hasEntered = false;
+        const enterGame = event => {
+          if (hasEntered) return;
+          hasEntered = true;
+          if (event && event.cancelable) event.preventDefault();
+          // Unity Web Audio defaults to iOS' ambient session, which is muted by
+          // the Ring/Silent switch. Safari 17+ exposes the playback category so
+          // user-requested game music remains audible in silent mode.
+          try {
+            if (navigator.audioSession) navigator.audioSession.type = "playback";
+          } catch (error) {
+            console.warn("Could not select the iOS playback audio session: " + error);
+          }
+          // Keep SendMessage in the original pointer/touch call stack so iOS
+          // recognizes the Web Audio resume as a genuine user gesture.
+          unityInstance.SendMessage("StarAbyssGame", "UnlockWebAudio");
+          enter.remove();
+          canvas.focus();
+        };
+        if (window.PointerEvent) {
+          enterButton.addEventListener("pointerdown", enterGame, { once: true });
+        } else {
+          enterButton.addEventListener("touchstart", enterGame, { once: true, passive: false });
+          enterButton.addEventListener("mousedown", enterGame, { once: true });
+        }
+        enterButton.addEventListener("click", enterGame, { once: true });
+      }).catch(showError);
+    };
+    loader.onerror = () => showError("无法下载 Unity 加载器。");
+    document.body.appendChild(loader);
+  </script>
+</body>
+</html>
