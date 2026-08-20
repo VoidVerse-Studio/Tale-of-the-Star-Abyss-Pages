@@ -40,6 +40,7 @@
   <section id="error"></section>
   <aside id="rotate-hint">请将手机转回竖屏</aside>
   <script>
+    const VERBOSE = false;
     const canvas = document.querySelector("#unity-canvas");
     const loading = document.querySelector("#loading");
     const progressBar = document.querySelector("#progress-bar");
@@ -48,8 +49,12 @@
     const enterButton = document.querySelector("#enter-button");
     const errorPanel = document.querySelector("#error");
     const buildUrl = "Build";
-    const cacheVersion = new URLSearchParams(window.location.search).get("v") || "63.0.0";
+    const query = new URLSearchParams(window.location.search);
+    const cacheVersion = query.get("v") || "63.0.0";
     const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion);
+    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v63";
+    const PRODUCT = "星渊引";
+    const VERSION = "63.0.0";
     const loaderUrl = buildUrl + "/StarAbyss-Unity-V63-WebGL.loader.js" + cacheSuffix;
     const config = {
       dataUrl: buildUrl + "/StarAbyss-Unity-V63-WebGL.data.unityweb" + cacheSuffix,
@@ -64,60 +69,102 @@
       autoSyncPersistentDataPath: true,
       showBanner: (message, type) => {
         if (type === "error") showError(message);
-        else console.warn(message);
+        else if (VERBOSE && console && console.warn) console.warn(message);
       }
     };
 
     function showError(message) {
       loading.style.display = "none";
       enter.style.display = "none";
-      errorPanel.textContent = "Unity V63 载入失败。请刷新页面后重试。\n" + message;
+      const fallback = "Unity V63 入口校验失败，当前页面已禁止继续加载。请重新从官方页面进入，或稍后刷新重试。";
+      const detail = (message && message !== true && VERBOSE) ? (" " + message) : "";
+      errorPanel.textContent = fallback + detail;
       errorPanel.style.display = "flex";
+    }
+
+    function toHex(bytes) {
+      return Array.from(bytes).map(value => value.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function sha256Hex(text) {
+      const data = new TextEncoder().encode(text);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return toHex(new Uint8Array(digest));
+    }
+
+    function secureCompare(a, b) {
+      if (a.length !== b.length) return false;
+      let result = 0;
+      for (let i = 0; i < a.length; i++) result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+      return result === 0;
+    }
+
+    async function verifyEntranceSignature() {
+      const sigParam = query.get("sig");
+      if (!sigParam) return false;
+      if (!/^[0-9a-f]{64}$/i.test(sigParam)) return false;
+
+      // Static Pages cannot keep a server secret. Bind the public share URL to
+      // this exact build version so the WeChat link remains valid until the
+      // next published build while still rejecting casual URL substitution.
+      const payload = `${cacheVersion}|${PRODUCT}|${VERSION}|${salt}`;
+      const expected = await sha256Hex(payload);
+      return secureCompare(expected.toLowerCase(), sigParam.toLowerCase());
     }
 
     canvas.addEventListener("contextmenu", event => event.preventDefault());
     canvas.addEventListener("touchmove", event => event.preventDefault(), { passive: false });
 
-    const loader = document.createElement("script");
-    loader.src = loaderUrl;
-    loader.onload = () => {
-      createUnityInstance(canvas, config, progress => {
-        const percent = Math.round(progress * 100);
-        progressBar.style.width = percent + "%";
-        progressText.textContent = "载入 Unity V63 · " + percent + "%";
-      }).then(unityInstance => {
-        loading.style.display = "none";
-        enter.style.display = "flex";
-        let hasEntered = false;
-        const enterGame = event => {
-          if (hasEntered) return;
-          hasEntered = true;
-          if (event && event.cancelable) event.preventDefault();
-          // Unity Web Audio defaults to iOS' ambient session, which is muted by
-          // the Ring/Silent switch. Safari 17+ exposes the playback category so
-          // user-requested game music remains audible in silent mode.
-          try {
-            if (navigator.audioSession) navigator.audioSession.type = "playback";
-          } catch (error) {
-            console.warn("Could not select the iOS playback audio session: " + error);
-          }
-          // Keep SendMessage in the original pointer/touch call stack so iOS
-          // recognizes the Web Audio resume as a genuine user gesture.
-          unityInstance.SendMessage("StarAbyssGame", "UnlockWebAudio");
-          enter.remove();
-          canvas.focus();
-        };
-        if (window.PointerEvent) {
-          enterButton.addEventListener("pointerdown", enterGame, { once: true });
-        } else {
-          enterButton.addEventListener("touchstart", enterGame, { once: true, passive: false });
-          enterButton.addEventListener("mousedown", enterGame, { once: true });
+    (async () => {
+      const ok = await verifyEntranceSignature();
+      if (!ok) {
+        if (VERBOSE && console && console.warn) {
+          console.warn("WebGL entry signature validation failed.");
         }
-        enterButton.addEventListener("click", enterGame, { once: true });
-      }).catch(showError);
-    };
-    loader.onerror = () => showError("无法下载 Unity 加载器。");
-    document.body.appendChild(loader);
+        showError();
+        return;
+      }
+
+      const loader = document.createElement("script");
+      loader.src = loaderUrl;
+      loader.onload = () => {
+        createUnityInstance(canvas, config, progress => {
+          const percent = Math.round(progress * 100);
+          progressBar.style.width = percent + "%";
+          progressText.textContent = "载入 Unity V63 · " + percent + "%";
+        }).then(unityInstance => {
+          loading.style.display = "none";
+          enter.style.display = "flex";
+          let hasEntered = false;
+          const enterGame = event => {
+            if (hasEntered) return;
+            hasEntered = true;
+            if (event && event.cancelable) event.preventDefault();
+            // Unity Web Audio defaults to iOS' ambient session, which is muted by
+            // the Ring/Silent switch. Safari 17+ exposes the playback category so
+            // user-requested game music remains audible in silent mode.
+            try {
+              if (navigator.audioSession) navigator.audioSession.type = "playback";
+            } catch {
+            }
+            // Keep SendMessage in the original pointer/touch call stack so iOS
+            // recognizes the Web Audio resume as a genuine user gesture.
+            unityInstance.SendMessage("StarAbyssGame", "UnlockWebAudio");
+            enter.remove();
+            canvas.focus();
+          };
+          if (window.PointerEvent) {
+            enterButton.addEventListener("pointerdown", enterGame, { once: true });
+          } else {
+            enterButton.addEventListener("touchstart", enterGame, { once: true, passive: false });
+            enterButton.addEventListener("mousedown", enterGame, { once: true });
+          }
+          enterButton.addEventListener("click", enterGame, { once: true });
+        }).catch(() => showError("Unity V63 运行时启动失败。"));
+      };
+      loader.onerror = () => showError("Unity V63 入口加载失败。");
+      document.body.appendChild(loader);
+    })();
   </script>
 </body>
 </html>
