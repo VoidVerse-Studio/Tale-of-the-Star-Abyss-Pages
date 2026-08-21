@@ -101,14 +101,25 @@
 
     async function verifyEntranceSignature() {
       const sigParam = query.get("sig");
-      if (!sigParam) return false;
-      if (!/^[0-9a-f]{64}$/i.test(sigParam)) return false;
-
       // Static Pages cannot keep a server secret. Bind the public share URL to
       // this exact build version so the WeChat link remains valid until the
       // next published build while still rejecting casual URL substitution.
       const payload = `${cacheVersion}|${PRODUCT}|${VERSION}|${salt}`;
       const expected = await sha256Hex(payload);
+
+      // WeChat commonly strips long query strings when a link is forwarded.
+      // On the one canonical public host, restore the signature locally so the
+      // official short share URL remains usable without weakening other hosts.
+      if (!sigParam) {
+        const officialHost = window.location.hostname.toLowerCase() === "voidverse-studio.github.io";
+        const officialPath = window.location.pathname.startsWith("/Tale-of-the-Star-Abyss-Pages/");
+        if (!officialHost || !officialPath) return false;
+        query.set("sig", expected);
+        const signedUrl = window.location.pathname + "?" + query.toString() + window.location.hash;
+        window.history.replaceState(null, "", signedUrl);
+        return true;
+      }
+      if (!/^[0-9a-f]{64}$/i.test(sigParam)) return false;
       return secureCompare(expected.toLowerCase(), sigParam.toLowerCase());
     }
 
