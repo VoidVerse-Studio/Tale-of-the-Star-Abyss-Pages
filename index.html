@@ -6,7 +6,11 @@
   <meta name="theme-color" content="#11100d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>星渊引 · Unity V63</title>
+  <meta name="description" content="《星渊引》古风剧情互动游戏 · 手机竖屏 WebGL 版">
+  <meta property="og:title" content="星渊引">
+  <meta property="og:description" content="古风剧情互动游戏 · 点击进入">
+  <meta property="og:type" content="website">
+  <title>星渊引 · WebGL V133</title>
   <style>
     :root { color-scheme: dark; background: #11100d; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,7 +38,7 @@
   <section id="loading" aria-live="polite">
     <div id="loading-title">星渊引</div>
     <div id="progress-track"><div id="progress-bar"></div></div>
-    <div id="progress-text">载入 Unity V63 · 0%</div>
+    <div id="progress-text">载入 WebGL V133 · 0%</div>
   </section>
   <section id="enter"><button id="enter-button" type="button">轻触进入</button></section>
   <section id="error"></section>
@@ -50,20 +54,20 @@
     const errorPanel = document.querySelector("#error");
     const buildUrl = "Build";
     const query = new URLSearchParams(window.location.search);
-    const cacheVersion = query.get("v") || "63.0.0";
+    const cacheVersion = query.get("v") || "133.0.0";
     const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion);
-    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v63";
+    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v133";
     const PRODUCT = "星渊引";
-    const VERSION = "63.0.0";
-    const loaderUrl = buildUrl + "/StarAbyss-Unity-V63-WebGL.loader.js" + cacheSuffix;
+    const VERSION = "133.0.0";
+    const loaderUrl = buildUrl + "/StarAbyss-WebGL-WeChat.loader.js" + cacheSuffix;
     const config = {
-      dataUrl: buildUrl + "/StarAbyss-Unity-V63-WebGL.data.unityweb" + cacheSuffix,
-      frameworkUrl: buildUrl + "/StarAbyss-Unity-V63-WebGL.framework.js.unityweb" + cacheSuffix,
-      codeUrl: buildUrl + "/StarAbyss-Unity-V63-WebGL.wasm.unityweb" + cacheSuffix,
+      dataUrl: buildUrl + "/StarAbyss-WebGL-WeChat.data.unityweb" + cacheSuffix,
+      frameworkUrl: buildUrl + "/StarAbyss-WebGL-WeChat.framework.js.unityweb" + cacheSuffix,
+      codeUrl: buildUrl + "/StarAbyss-WebGL-WeChat.wasm.unityweb" + cacheSuffix,
       streamingAssetsUrl: "StreamingAssets",
       companyName: "VoidVerse Studio",
       productName: "星渊引",
-      productVersion: "63.0.0",
+      productVersion: "133.0.0",
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       matchWebGLToCanvasSize: true,
       autoSyncPersistentDataPath: true,
@@ -76,7 +80,7 @@
     function showError(message) {
       loading.style.display = "none";
       enter.style.display = "none";
-      const fallback = "Unity V63 入口校验失败，当前页面已禁止继续加载。请重新从官方页面进入，或稍后刷新重试。";
+      const fallback = "WebGL V133 入口校验失败，请使用 HTTPS 分享地址重新打开。";
       const detail = (message && message !== true && VERBOSE) ? (" " + message) : "";
       errorPanel.textContent = fallback + detail;
       errorPanel.style.display = "flex";
@@ -108,12 +112,12 @@
       const expected = await sha256Hex(payload);
 
       // WeChat commonly strips long query strings when a link is forwarded.
-      // On the one canonical public host, restore the signature locally so the
-      // official short share URL remains usable without weakening other hosts.
+      // Any HTTPS static host may restore the build-bound signature locally,
+      // so an uploaded short URL can be shared directly inside WeChat.
       if (!sigParam) {
-        const officialHost = window.location.hostname.toLowerCase() === "voidverse-studio.github.io";
-        const officialPath = window.location.pathname.startsWith("/Tale-of-the-Star-Abyss-Pages/");
-        if (!officialHost || !officialPath) return false;
+        const localPreview = window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+        if (!window.isSecureContext && !localPreview) return false;
         query.set("sig", expected);
         const signedUrl = window.location.pathname + "?" + query.toString() + window.location.hash;
         window.history.replaceState(null, "", signedUrl);
@@ -142,7 +146,7 @@
         createUnityInstance(canvas, config, progress => {
           const percent = Math.round(progress * 100);
           progressBar.style.width = percent + "%";
-          progressText.textContent = "载入 Unity V63 · " + percent + "%";
+          progressText.textContent = "载入 WebGL V133 · " + percent + "%";
         }).then(unityInstance => {
           loading.style.display = "none";
           enter.style.display = "flex";
@@ -171,9 +175,9 @@
             enterButton.addEventListener("mousedown", enterGame, { once: true });
           }
           enterButton.addEventListener("click", enterGame, { once: true });
-        }).catch(() => showError("Unity V63 运行时启动失败。"));
+        }).catch(() => showError("WebGL V133 运行时启动失败。"));
       };
-      loader.onerror = () => showError("Unity V63 入口加载失败。");
+      loader.onerror = () => showError("WebGL V133 入口加载失败。");
       document.body.appendChild(loader);
     })();
   </script>
