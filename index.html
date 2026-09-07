@@ -134,7 +134,10 @@
       const partNames = ["aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am"];
       let completed = 0;
       const parts = await Promise.all(partNames.map(async name => {
-        const url = buildUrl + "/StarAbyss-WebGL-WeChat.data.part." + name + cacheSuffix;
+        const useSharedMedia = location.hostname === "xingyuanyin-webgl.adelezviolet.chatgpt.site";
+        const url = name === "aa" && useSharedMedia
+          ? "/api/game-media/aa" + cacheSuffix
+          : buildUrl + "/StarAbyss-WebGL-WeChat.data.part." + name + cacheSuffix;
         const response = await fetch(url, { cache: "force-cache" });
         if (!response.ok) throw new Error("资源分片载入失败：" + name);
         const bytes = await response.arrayBuffer();
