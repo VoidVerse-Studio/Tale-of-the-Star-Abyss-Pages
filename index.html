@@ -10,7 +10,7 @@
   <meta property="og:title" content="星渊引">
   <meta property="og:description" content="古风剧情互动游戏 · 点击进入">
   <meta property="og:type" content="website">
-  <title>星渊引 · WebGL V133</title>
+  <title>星渊引 · WebGL V157</title>
   <style>
     :root { color-scheme: dark; background: #11100d; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,7 +28,7 @@
     #enter-button { min-width: 190px; padding: 15px 28px; border: 1px solid rgba(216,179,103,.8); border-radius: 2px; color: #f2e5c8; background: rgba(43,52,38,.94); font: inherit; font-size: 17px; letter-spacing: .18em; }
     #error { display: none; padding: 28px; color: #f1dfc1; background: #17120f; text-align: center; line-height: 1.7; touch-action: auto; }
     #rotate-hint { display: none; z-index: 20; padding: 24px; color: #ead8b7; background: rgba(17,16,13,.96); text-align: center; letter-spacing: .12em; }
-    @media (orientation: landscape) and (max-height: 600px) { #rotate-hint { display: flex; } }
+    @media (orientation: landscape) and (max-height: 600px) { html:not(.starabyss-map-open) #rotate-hint { display: flex; } }
   </style>
 </head>
 <body>
@@ -38,7 +38,7 @@
   <section id="loading" aria-live="polite">
     <div id="loading-title">星渊引</div>
     <div id="progress-track"><div id="progress-bar"></div></div>
-    <div id="progress-text">载入 WebGL V133 · 0%</div>
+    <div id="progress-text">载入 WebGL V157 · 0%</div>
   </section>
   <section id="enter"><button id="enter-button" type="button">轻触进入</button></section>
   <section id="error"></section>
@@ -54,20 +54,20 @@
     const errorPanel = document.querySelector("#error");
     const buildUrl = "Build";
     const query = new URLSearchParams(window.location.search);
-    const cacheVersion = query.get("v") || "133.0.0";
-    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion);
-    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v133";
+    const cacheVersion = query.get("v") || "157.0.0";
+    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&build=54324106d90b35d5";
+    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v157";
     const PRODUCT = "星渊引";
-    const VERSION = "133.0.0";
+    const VERSION = "157.0.0";
     const loaderUrl = buildUrl + "/StarAbyss-WebGL-WeChat.loader.js" + cacheSuffix;
     const config = {
-      dataUrl: buildUrl + "/StarAbyss-WebGL-WeChat.data.unityweb" + cacheSuffix,
+      dataUrl: "",
       frameworkUrl: buildUrl + "/StarAbyss-WebGL-WeChat.framework.js.unityweb" + cacheSuffix,
       codeUrl: buildUrl + "/StarAbyss-WebGL-WeChat.wasm.unityweb" + cacheSuffix,
       streamingAssetsUrl: "StreamingAssets",
       companyName: "VoidVerse Studio",
       productName: "星渊引",
-      productVersion: "133.0.0",
+      productVersion: "157.0.0",
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       matchWebGLToCanvasSize: true,
       autoSyncPersistentDataPath: true,
@@ -80,7 +80,7 @@
     function showError(message) {
       loading.style.display = "none";
       enter.style.display = "none";
-      const fallback = "WebGL V133 入口校验失败，请使用 HTTPS 分享地址重新打开。";
+      const fallback = "WebGL V157 入口校验失败，请使用 HTTPS 分享地址重新打开。";
       const detail = (message && message !== true && VERBOSE) ? (" " + message) : "";
       errorPanel.textContent = fallback + detail;
       errorPanel.style.display = "flex";
@@ -130,6 +130,23 @@
     canvas.addEventListener("contextmenu", event => event.preventDefault());
     canvas.addEventListener("touchmove", event => event.preventDefault(), { passive: false });
 
+    async function prepareChunkedData() {
+      const partNames = ["aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am"];
+      let completed = 0;
+      const parts = await Promise.all(partNames.map(async name => {
+        const url = buildUrl + "/StarAbyss-WebGL-WeChat.data.part." + name + cacheSuffix;
+        const response = await fetch(url, { cache: "force-cache" });
+        if (!response.ok) throw new Error("资源分片载入失败：" + name);
+        const bytes = await response.arrayBuffer();
+        completed += 1;
+        const percent = Math.round((completed / partNames.length) * 55);
+        progressBar.style.width = percent + "%";
+        progressText.textContent = "载入 WebGL V157 · " + percent + "%";
+        return bytes;
+      }));
+      return URL.createObjectURL(new Blob(parts, { type: "application/octet-stream" }));
+    }
+
     (async () => {
       const ok = await verifyEntranceSignature();
       if (!ok) {
@@ -140,14 +157,23 @@
         return;
       }
 
+      try {
+        config.dataUrl = await prepareChunkedData();
+      } catch (error) {
+        if (VERBOSE && console && console.error) console.error(error);
+        showError("WebGL V157 资源包载入失败。");
+        return;
+      }
+
       const loader = document.createElement("script");
       loader.src = loaderUrl;
       loader.onload = () => {
         createUnityInstance(canvas, config, progress => {
-          const percent = Math.round(progress * 100);
+          const percent = 55 + Math.round(progress * 45);
           progressBar.style.width = percent + "%";
-          progressText.textContent = "载入 WebGL V133 · " + percent + "%";
+          progressText.textContent = "载入 WebGL V157 · " + percent + "%";
         }).then(unityInstance => {
+          URL.revokeObjectURL(config.dataUrl);
           loading.style.display = "none";
           enter.style.display = "flex";
           let hasEntered = false;
@@ -175,9 +201,9 @@
             enterButton.addEventListener("mousedown", enterGame, { once: true });
           }
           enterButton.addEventListener("click", enterGame, { once: true });
-        }).catch(() => showError("WebGL V133 运行时启动失败。"));
+        }).catch(() => showError("WebGL V157 运行时启动失败。"));
       };
-      loader.onerror = () => showError("WebGL V133 入口加载失败。");
+      loader.onerror = () => showError("WebGL V157 入口加载失败。");
       document.body.appendChild(loader);
     })();
   </script>
