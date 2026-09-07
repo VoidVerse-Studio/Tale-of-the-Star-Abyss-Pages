@@ -10,7 +10,7 @@
   <meta property="og:title" content="星渊引">
   <meta property="og:description" content="古风剧情互动游戏 · 点击进入">
   <meta property="og:type" content="website">
-  <title>星渊引 · WebGL V159</title>
+  <title>星渊引 · WebGL V160</title>
   <style>
     :root { color-scheme: dark; background: #11100d; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -38,7 +38,7 @@
   <section id="loading" aria-live="polite">
     <div id="loading-title">星渊引</div>
     <div id="progress-track"><div id="progress-bar"></div></div>
-    <div id="progress-text">载入 WebGL V159 · 0%</div>
+    <div id="progress-text">载入 WebGL V160 · 0%</div>
   </section>
   <section id="enter"><button id="enter-button" type="button">轻触进入</button></section>
   <section id="error"></section>
@@ -52,22 +52,22 @@
     const enter = document.querySelector("#enter");
     const enterButton = document.querySelector("#enter-button");
     const errorPanel = document.querySelector("#error");
-    const buildUrl = "Build/0e52d46c5e30f16cb7ceeab48185405d1d73e656c1190d33dfd6663b4aca292d";
+    const buildUrl = "Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053";
     const query = new URLSearchParams(window.location.search);
-    const cacheVersion = query.get("v") || "159.0.0";
-    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&build=0e52d46c5e30f16c";
-    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v159";
+    const cacheVersion = query.get("v") || "160.0.0";
+    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&build=c5ae0326029bb868";
+    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v160";
     const PRODUCT = "星渊引";
-    const VERSION = "159.0.0";
+    const VERSION = "160.0.0";
     const loaderUrl = buildUrl + "/StarAbyss-WebGL-WeChat.loader.js" + cacheSuffix;
     const config = {
       dataUrl: "",
       frameworkUrl: buildUrl + "/StarAbyss-WebGL-WeChat.framework.js.unityweb" + cacheSuffix,
       codeUrl: buildUrl + "/StarAbyss-WebGL-WeChat.wasm.unityweb" + cacheSuffix,
-      streamingAssetsUrl: "StreamingAssets/0e52d46c5e30f16cb7ceeab48185405d1d73e656c1190d33dfd6663b4aca292d",
+      streamingAssetsUrl: "StreamingAssets/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053",
       companyName: "VoidVerse Studio",
       productName: "星渊引",
-      productVersion: "159.0.0",
+      productVersion: "160.0.0",
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       matchWebGLToCanvasSize: true,
       autoSyncPersistentDataPath: true,
@@ -80,7 +80,7 @@
     function showError(message) {
       loading.style.display = "none";
       enter.style.display = "none";
-      const fallback = "WebGL V159 入口校验失败，请使用 HTTPS 分享地址重新打开。";
+      const fallback = "WebGL V160 入口校验失败，请使用 HTTPS 分享地址重新打开。";
       const detail = (message && message !== true && VERBOSE) ? (" " + message) : "";
       errorPanel.textContent = fallback + detail;
       errorPanel.style.display = "flex";
@@ -104,42 +104,37 @@
     }
 
     async function verifyEntranceSignature() {
+      if (query.getAll("sig").length > 1) return false;
       const sigParam = query.get("sig");
-      // Static Pages cannot keep a server secret. Bind the public share URL to
-      // this exact build version so the WeChat link remains valid until the
-      // next published build while still rejecting casual URL substitution.
-      const payload = `${cacheVersion}|${PRODUCT}|${VERSION}|${salt}`;
-      const expected = await sha256Hex(payload);
-
-      // WeChat commonly strips long query strings when a link is forwarded.
-      // Any HTTPS static host may restore the build-bound signature locally,
-      // so an uploaded short URL can be shared directly inside WeChat.
-      if (!sigParam) {
-        const localPreview = window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1";
+      // Public compatibility checksum, not authentication or authorization.
+      const expected = await sha256Hex(cacheVersion + "|" + PRODUCT + "|" + VERSION + "|" + salt);
+      if (sigParam === null) {
+        const localPreview = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
         if (!window.isSecureContext && !localPreview) return false;
         query.set("sig", expected);
-        const signedUrl = window.location.pathname + "?" + query.toString() + window.location.hash;
-        window.history.replaceState(null, "", signedUrl);
+        window.history.replaceState(null, "", window.location.pathname + "?" + query.toString() + window.location.hash);
         return true;
       }
       if (!/^[0-9a-f]{64}$/i.test(sigParam)) return false;
-      if (secureCompare(expected.toLowerCase(), sigParam.toLowerCase())) return true;
-      // Public compatibility checksum, not authentication or authorization.
-      const previousVersion = "158.0.0";
-      const previousCache = query.get("v") || previousVersion;
-      const previous = await sha256Hex(previousCache + "|" + PRODUCT + "|" + previousVersion + "|starabyss-mobile-entry-v158");
-      if (!secureCompare(previous, sigParam.toLowerCase())) return false;
-      query.set("sig", expected);
-      window.history.replaceState(null, "", window.location.pathname + "?" + query.toString() + window.location.hash);
-      return true;
+      if (secureCompare(expected, sigParam.toLowerCase())) return true;
+      const previousVersions = ["159.0.0", "158.0.0"];
+      for (const previousVersion of previousVersions) {
+        const previousCache = query.get("v") || previousVersion;
+        const previousSalt = "starabyss-mobile-entry-v" + previousVersion.split(".")[0];
+        const previous = await sha256Hex(previousCache + "|" + PRODUCT + "|" + previousVersion + "|" + previousSalt);
+        if (!secureCompare(previous, sigParam.toLowerCase())) continue;
+        query.set("sig", expected);
+        window.history.replaceState(null, "", window.location.pathname + "?" + query.toString() + window.location.hash);
+        return true;
+      }
+      return false;
     }
 
     canvas.addEventListener("contextmenu", event => event.preventDefault());
     canvas.addEventListener("touchmove", event => event.preventDefault(), { passive: false });
 
     async function prepareChunkedData() {
-      const partNames = ["aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am"];
+      const partNames = ["aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am","an"];
       let completed = 0;
       const parts = await Promise.all(partNames.map(async name => {
         const url = buildUrl + "/StarAbyss-WebGL-WeChat.data.part." + name + cacheSuffix;
@@ -149,7 +144,7 @@
         completed += 1;
         const percent = Math.round((completed / partNames.length) * 55);
         progressBar.style.width = percent + "%";
-        progressText.textContent = "载入 WebGL V159 · " + percent + "%";
+        progressText.textContent = "载入 WebGL V160 · " + percent + "%";
         return bytes;
       }));
       return URL.createObjectURL(new Blob(parts, { type: "application/octet-stream" }));
@@ -169,7 +164,7 @@
         config.dataUrl = await prepareChunkedData();
       } catch (error) {
         if (VERBOSE && console && console.error) console.error(error);
-        showError("WebGL V159 资源包载入失败。");
+        showError("WebGL V160 资源包载入失败。");
         return;
       }
 
@@ -179,7 +174,7 @@
         createUnityInstance(canvas, config, progress => {
           const percent = 55 + Math.round(progress * 45);
           progressBar.style.width = percent + "%";
-          progressText.textContent = "载入 WebGL V159 · " + percent + "%";
+          progressText.textContent = "载入 WebGL V160 · " + percent + "%";
         }).then(unityInstance => {
           URL.revokeObjectURL(config.dataUrl);
           loading.style.display = "none";
@@ -209,9 +204,9 @@
             enterButton.addEventListener("mousedown", enterGame, { once: true });
           }
           enterButton.addEventListener("click", enterGame, { once: true });
-        }).catch(() => showError("WebGL V159 运行时启动失败。"));
+        }).catch(() => showError("WebGL V160 运行时启动失败。"));
       };
-      loader.onerror = () => showError("WebGL V159 入口加载失败。");
+      loader.onerror = () => showError("WebGL V160 入口加载失败。");
       document.body.appendChild(loader);
     })();
   </script>
