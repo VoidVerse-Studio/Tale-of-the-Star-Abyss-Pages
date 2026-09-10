@@ -52,14 +52,14 @@
     const enter = document.querySelector("#enter");
     const enterButton = document.querySelector("#enter-button");
     const errorPanel = document.querySelector("#error");
-    const runtimeUrls = Object.freeze({"loader":"Build/673f465ec513b2a4490eaa914d584ff14e282cdfc508758597faca2f40860dd7/StarAbyss-WebGL-WeChat.loader.js","framework":"","wasm":""});
+    const runtimeUrls = Object.freeze({"loader":"Build/5dc80d58c3a34883930f16d7f4360ae0eabc407fb22e07a588eaf5872bafd876/StarAbyss-WebGL-WeChat.loader.js","framework":"","wasm":""});
     const reconstructionModule = "./Build/71f428715cfd5d75da127be47a7a84e86a87444d35d422a0779a786169b58b48/composed-client.092891f28bc585a0af6d26481b64fbcd048e173dfb33821b9432f08b74b04219.mjs";
-    const dataRecipe = Object.freeze({"recipe":{"path":"Build/5d775b058c4296de3c1168f510cbe90bf2bdb8365fe703e425ad5b703e14c35c/StarAbyss.composed.recipe.4c59b1e4212caca9161b811bb2980a604cbcf27b6088ba765b1c11996bbd9944.bin","bytes":99647,"sha256":"4c59b1e4212caca9161b811bb2980a604cbcf27b6088ba765b1c11996bbd9944","rawBytes":269116,"rawSha256":"f20b2cf5ea41e1903fa8f20b1378f8f4e982aaafb7beb7458c74240c398475a4"},"output":{"bytes":395119954,"sha256":"5d775b058c4296de3c1168f510cbe90bf2bdb8365fe703e425ad5b703e14c35c"}});
-    const runtimeRecipes = Object.freeze({"framework":{"recipe":{"path":"Build/a7060a0cc070e641ea242cbca3eac4c235d68d48de9cbbc7535f6e53d0815f71/StarAbyss.runtime.recipe.af6ab2e6acc4a757b65347c2ca571e50a8b6152b1f5a0e9970b14c5a77bc5b51.bin","bytes":1121,"sha256":"af6ab2e6acc4a757b65347c2ca571e50a8b6152b1f5a0e9970b14c5a77bc5b51","rawBytes":2524,"rawSha256":"fc9e3cd492e1592e7f4ecafaffc661261a959cf8199d30c55ad2f474ae65b914"},"output":{"bytes":443631,"sha256":"a7060a0cc070e641ea242cbca3eac4c235d68d48de9cbbc7535f6e53d0815f71"}},"wasm":{"recipe":{"path":"Build/02f8d75f4f5286451e56b0babd383400fa3460afda6df34f189a19826fb19344/StarAbyss.runtime.recipe.e142273e7726cd6efbf4ba3f94291ed1311eaf5545d4856e75e4a3d3eede5833.bin","bytes":419441,"sha256":"e142273e7726cd6efbf4ba3f94291ed1311eaf5545d4856e75e4a3d3eede5833","rawBytes":1279619,"rawSha256":"9973ec4cb10cf579ffd0a1844c80196c898076b01649c7c47f1a833c3c514d5d"},"output":{"bytes":21957176,"sha256":"02f8d75f4f5286451e56b0babd383400fa3460afda6df34f189a19826fb19344"}}});
+    const dataRecipe = Object.freeze({"recipe":{"path":"Build/6537e629ea444a8b108b3fdf248e825946b16d4b644e578247edfb0cf17e079b/StarAbyss.composed.recipe.458b00384103457e880d710aa50d671605d48b3ded2eb5771f98efee85ffa640.bin","bytes":102997,"sha256":"458b00384103457e880d710aa50d671605d48b3ded2eb5771f98efee85ffa640","rawBytes":280942,"rawSha256":"d17d500037c6bec44b5a665094ff3b198a8cf2c02213b48be5c006c9c3713902"},"output":{"bytes":396060687,"sha256":"6537e629ea444a8b108b3fdf248e825946b16d4b644e578247edfb0cf17e079b"}});
+    const runtimeRecipes = Object.freeze({"framework":{"recipe":{"path":"Build/83e5de344e7478f2acbf41307304efb014a350557470d8168e897937c3455100/StarAbyss.runtime.recipe.ffe1e8f6246adb18b612ef6d4e76f5c5f53daa5cbde234a927b2aaf612cf7187.bin","bytes":1136,"sha256":"ffe1e8f6246adb18b612ef6d4e76f5c5f53daa5cbde234a927b2aaf612cf7187","rawBytes":2532,"rawSha256":"ecb185f0cf8b8d9248eb7381931f7bf7dbfb469e1d4c0d05501f67a6d69ebb22"},"output":{"bytes":443814,"sha256":"83e5de344e7478f2acbf41307304efb014a350557470d8168e897937c3455100"}},"wasm":{"recipe":{"path":"Build/43cf5676c38ce3d16d119fe5b5f083c3e252c98bf3ee4e347e151bccde78db80/StarAbyss.runtime.recipe.e9e511d11d5a6b3f6b18299a266b97137953035845b4e0960f885f7338c58192.bin","bytes":420751,"sha256":"e9e511d11d5a6b3f6b18299a266b97137953035845b4e0960f885f7338c58192","rawBytes":1286234,"rawSha256":"e5437545d0f0ea30ffeb8c5a07efebf055a9e7f0b5df6c7ffd96b682eeee8958"},"output":{"bytes":22109175,"sha256":"43cf5676c38ce3d16d119fe5b5f083c3e252c98bf3ee4e347e151bccde78db80"}}});
     const reconstructedRuntimeUrls = [];
     const query = new URLSearchParams(window.location.search);
     const cacheVersion = query.get("v") || "161.0.0";
-    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&build=221cfd0747cb1fbc";
+    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&build=9183119198116be4";
     const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v161";
     const PRODUCT = "星渊引";
     const VERSION = "161.0.0";
@@ -139,23 +139,101 @@
 
     async function prepareChunkedData() {
       const shipped = await import(reconstructionModule + cacheSuffix);
-      const readSource = shipped.createPublicAssetReader({ baseUrl: new URL("./", window.location.href).href, allowLocalPreview: true });
+      const loadingSupport = (function createLoadingSupportV165({baseUrl,assets,fetchImpl,onUpdate=()=>{},sleep}){
+  const fail=message=>{throw Error('V165 asset: '+message);};
+  const base=new URL(baseUrl),byUrl=new Map(),byPath=new Map();
+  if(base.username||base.password||base.search||base.hash||!base.pathname.endsWith('/')||
+    !(base.protocol==='https:'||base.protocol==='http:'&&['localhost','127.0.0.1'].includes(base.hostname)))fail('unsafe base');
+  if(!Array.isArray(assets)||assets.length<1||assets.length>1024||typeof fetchImpl!=='function')fail('invalid reader configuration');
+  for(const file of assets){
+    if(!file||typeof file.path!=='string'||!/^Build\/[0-9a-f]{64}\/[A-Za-z0-9.-]+$/.test(file.path)||
+      !Number.isSafeInteger(file.bytes)||file.bytes<1||file.bytes>20*1024*1024||!/^[0-9a-f]{64}$/.test(file.sha256)||byPath.has(file.path))fail('invalid immutable descriptor');
+    if(new URL(file.path,base).pathname!==base.pathname+file.path)fail('non-canonical immutable path');
+    const descriptor=Object.freeze({path:file.path,bytes:file.bytes,sha256:file.sha256});
+    byPath.set(file.path,descriptor);byUrl.set(new URL(file.path,base).href,descriptor);
+  }
+  const abortError=()=>{const error=new Error('Asset request cancelled');error.name='AbortError';return error;};
+  const pause=sleep||((ms,signal)=>new Promise((resolve,reject)=>{
+    if(signal?.aborted){reject(abortError());return;}
+    let timer;
+    const abort=()=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);reject(abortError());};
+    timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},ms);
+    signal?.addEventListener('abort',abort,{once:true});
+  }));
+  let completedBytes=0,percent=0,phase='程序';const counted=new Set();
+  const emit=detail=>onUpdate({text:detail+' · 已读取 '+(completedBytes/1048576).toFixed(1)+' MiB',percent,completedBytes});
+  const fetchAsset=async(url,options={})=>{
+    // Exact URL set: no new origin, query, redirect, credential or mutable endpoint.
+    if(typeof url!=='string'||!byUrl.has(url)||(options.method!==undefined&&options.method!=='GET')||
+      options.body!=null||options.redirect!=='error'||options.credentials!=='omit'||
+      options.referrerPolicy!=='no-referrer'||options.mode!=='same-origin'||options.cache!=='force-cache')fail('request outside immutable GET policy');
+    const signal=options.signal,retryStatus=new Set([408,429,500,502,503,504]);
+    for(let attempt=0;attempt<3;attempt++){
+      if(signal?.aborted)throw abortError();
+      let response;
+      try{response=await fetchImpl(url,options);}
+      catch(error){
+        if(signal?.aborted||error?.name==='AbortError')throw error;
+        if(attempt===2||!['TypeError','NetworkError'].includes(error?.name))throw error;
+        emit('连接中断，重试 '+(attempt+1)+'/2');await pause(attempt===0?400:1200,signal);continue;
+      }
+      if(signal?.aborted)throw abortError();
+      // A redirect is an integrity/origin failure, not an eligible retry response.
+      if(response.redirected||(response.url&&response.url!==url))fail('response redirected');
+      if(!retryStatus.has(response.status)||attempt===2)return response;
+      // Do not keep an unused retry response body or retry a body read failure.
+      if(response.body?.cancel)await response.body.cancel();
+      emit('连接繁忙，重试 '+(attempt+1)+'/2');await pause(attempt===0?400:1200,signal);
+    }
+    fail('retry bound');
+  };
+  return{
+    fetch:fetchAsset,
+    wrapReader(reader){
+      if(typeof reader!=='function')fail('invalid source reader');
+      return async(file,signal)=>{
+        const known=byPath.get(file?.path);
+        if(!known||known.bytes!==file.bytes||known.sha256!==file.sha256)fail('source descriptor differs');
+        emit('读取'+phase+'资源');
+        // No retry around reader: streamed-body/length/hash errors must propagate.
+        const bytes=await reader(file,signal);
+        if(signal?.aborted)throw abortError();
+        if(!(bytes instanceof Uint8Array)||bytes.length!==known.bytes)fail('source length differs');
+        if(!counted.has(file.path)){counted.add(file.path);completedBytes+=known.bytes;}
+        emit(phase+'解压与校验中');return bytes;
+      };
+    },
+    stage(name){phase=name;emit(name+'准备中');},
+    progress(state){
+      if(state.phase==='complete'){percent=55;emit('资源已校验，准备初始化');}
+      else if(state.phase==='literal'){
+        percent=Math.max(percent,30+Math.round(state.part/state.parts*24));
+        emit('增量解压与校验 '+state.part+'/'+state.parts);
+      }else if(state.phase==='source'){
+        // Single-file literal callbacks must not reset the bar back to 30%.
+        if(state.parts>1)percent=Math.max(percent,Math.round(state.part/state.parts*30));
+        emit(state.parts>1?'基础资源解压与校验 '+state.part+'/'+state.parts:'增量解压与校验中');
+      }
+    }
+  };
+})({
+        baseUrl: new URL("./", window.location.href).href, assets: [{"path":"Build/43cf5676c38ce3d16d119fe5b5f083c3e252c98bf3ee4e347e151bccde78db80/StarAbyss.runtime.literal.bb727736aaf7c678dcc088ae118493bfa2d9e22f00b3805c2b52e7c7b2259126.bin","bytes":2504816,"sha256":"bb727736aaf7c678dcc088ae118493bfa2d9e22f00b3805c2b52e7c7b2259126"},{"path":"Build/43cf5676c38ce3d16d119fe5b5f083c3e252c98bf3ee4e347e151bccde78db80/StarAbyss.runtime.recipe.e9e511d11d5a6b3f6b18299a266b97137953035845b4e0960f885f7338c58192.bin","bytes":420751,"sha256":"e9e511d11d5a6b3f6b18299a266b97137953035845b4e0960f885f7338c58192"},{"path":"Build/5d775b058c4296de3c1168f510cbe90bf2bdb8365fe703e425ad5b703e14c35c/StarAbyss.raw.literal.5012b8fb85c513dd6a7000fa38d4a756a4d353bd3a8339895967315f82d542ec.bin","bytes":9086912,"sha256":"5012b8fb85c513dd6a7000fa38d4a756a4d353bd3a8339895967315f82d542ec"},{"path":"Build/5d775b058c4296de3c1168f510cbe90bf2bdb8365fe703e425ad5b703e14c35c/StarAbyss.raw.literal.79b1533cbb5f73373dfb6ca4c5fec047cd4db6624ee5952f36f55dfc8201504f.bin","bytes":5903954,"sha256":"79b1533cbb5f73373dfb6ca4c5fec047cd4db6624ee5952f36f55dfc8201504f"},{"path":"Build/5d775b058c4296de3c1168f510cbe90bf2bdb8365fe703e425ad5b703e14c35c/StarAbyss.raw.literal.8bf420e161f50cdefbede08ab7161168e802321add431a00cda9b13773b078cc.bin","bytes":5819252,"sha256":"8bf420e161f50cdefbede08ab7161168e802321add431a00cda9b13773b078cc"},{"path":"Build/5d775b058c4296de3c1168f510cbe90bf2bdb8365fe703e425ad5b703e14c35c/StarAbyss.raw.literal.bb8130de0e0376c22fbfa5dc10d384d6cb1f26d999ec2cb81c86374f49e18f0f.bin","bytes":9719052,"sha256":"bb8130de0e0376c22fbfa5dc10d384d6cb1f26d999ec2cb81c86374f49e18f0f"},{"path":"Build/5dc80d58c3a34883930f16d7f4360ae0eabc407fb22e07a588eaf5872bafd876/StarAbyss-WebGL-WeChat.loader.js","bytes":47867,"sha256":"c6a9f11f79023e5f06dea099d7978ead37b86164385397a838ab56adce58f548"},{"path":"Build/6537e629ea444a8b108b3fdf248e825946b16d4b644e578247edfb0cf17e079b/StarAbyss.composed.recipe.458b00384103457e880d710aa50d671605d48b3ded2eb5771f98efee85ffa640.bin","bytes":102997,"sha256":"458b00384103457e880d710aa50d671605d48b3ded2eb5771f98efee85ffa640"},{"path":"Build/6537e629ea444a8b108b3fdf248e825946b16d4b644e578247edfb0cf17e079b/StarAbyss.raw.literal.20bd0f1428a39c8bacc3ec0b3c5ec86e285ecb700d5237efa1a38db826113838.bin","bytes":1241881,"sha256":"20bd0f1428a39c8bacc3ec0b3c5ec86e285ecb700d5237efa1a38db826113838"},{"path":"Build/71f428715cfd5d75da127be47a7a84e86a87444d35d422a0779a786169b58b48/composed-client.092891f28bc585a0af6d26481b64fbcd048e173dfb33821b9432f08b74b04219.mjs","bytes":15273,"sha256":"092891f28bc585a0af6d26481b64fbcd048e173dfb33821b9432f08b74b04219"},{"path":"Build/71f428715cfd5d75da127be47a7a84e86a87444d35d422a0779a786169b58b48/sha256-stream.66c3a569fa1db3f39c07c7a8fb0915c05d639fc207e39745b2bc42aacad63b64.mjs","bytes":3300,"sha256":"66c3a569fa1db3f39c07c7a8fb0915c05d639fc207e39745b2bc42aacad63b64"},{"path":"Build/71f428715cfd5d75da127be47a7a84e86a87444d35d422a0779a786169b58b48/StarAbyss.raw.literal.284b6f084ed8ee66ddd2bcbfb616c8a9fc58f13dfba42fb860a95fccad29795c.bin","bytes":2844712,"sha256":"284b6f084ed8ee66ddd2bcbfb616c8a9fc58f13dfba42fb860a95fccad29795c"},{"path":"Build/83e5de344e7478f2acbf41307304efb014a350557470d8168e897937c3455100/StarAbyss.runtime.literal.c62728ece36589f529f7794f0b32448b552f5ab207168d31a90b7e9eeeea063e.bin","bytes":535,"sha256":"c62728ece36589f529f7794f0b32448b552f5ab207168d31a90b7e9eeeea063e"},{"path":"Build/83e5de344e7478f2acbf41307304efb014a350557470d8168e897937c3455100/StarAbyss.runtime.recipe.ffe1e8f6246adb18b612ef6d4e76f5c5f53daa5cbde234a927b2aaf612cf7187.bin","bytes":1136,"sha256":"ffe1e8f6246adb18b612ef6d4e76f5c5f53daa5cbde234a927b2aaf612cf7187"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.1683b14c5c56857cb991d78b5e2b5b50cbe0cb8192b36c721d72a93e97740be1.bin","bytes":15218721,"sha256":"1683b14c5c56857cb991d78b5e2b5b50cbe0cb8192b36c721d72a93e97740be1"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.31219ff2b44de5ff076c2a8d2aef40a3531db7fbed9509fe84d7f0bfeec4305f.bin","bytes":2157800,"sha256":"31219ff2b44de5ff076c2a8d2aef40a3531db7fbed9509fe84d7f0bfeec4305f"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.462d63fe67b10588ee8eb1111c6e08f1b3c3a6ed3d91c01db473eec9cbe69bac.bin","bytes":15211576,"sha256":"462d63fe67b10588ee8eb1111c6e08f1b3c3a6ed3d91c01db473eec9cbe69bac"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.751380f941c75a242dfab9caba388febb3193d11b906116a61eac7188ec9c8cf.bin","bytes":15304425,"sha256":"751380f941c75a242dfab9caba388febb3193d11b906116a61eac7188ec9c8cf"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.8a8370eeeb13be937a23a682fdda6609b458abe57082db59ec1c39ed47373296.bin","bytes":15162642,"sha256":"8a8370eeeb13be937a23a682fdda6609b458abe57082db59ec1c39ed47373296"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.8b1902dccc29844ad459487999d567d458f87494c23b68a662fc9e64d1e25172.bin","bytes":15045757,"sha256":"8b1902dccc29844ad459487999d567d458f87494c23b68a662fc9e64d1e25172"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.8d1cd30c9333903f10723a616b4cd6fa2a5a100dac5de1c7c99e9520a7254dc9.bin","bytes":15054497,"sha256":"8d1cd30c9333903f10723a616b4cd6fa2a5a100dac5de1c7c99e9520a7254dc9"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.8d77019c4dcad36c054f11bf37093afe2616ae1cc207f7246a5fc764b1b17a27.bin","bytes":15163758,"sha256":"8d77019c4dcad36c054f11bf37093afe2616ae1cc207f7246a5fc764b1b17a27"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.90f784f177c91a30b5cb715d938fed3d75a0c59434619ef012b5396953b30389.bin","bytes":13767137,"sha256":"90f784f177c91a30b5cb715d938fed3d75a0c59434619ef012b5396953b30389"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.9c7c74089025bcd609f37db68fb1463cb489dff1c0ab2b181da95f000b0f79d8.bin","bytes":15211903,"sha256":"9c7c74089025bcd609f37db68fb1463cb489dff1c0ab2b181da95f000b0f79d8"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.ac13451227d4909a5c63c2bc10eb35095ebd70b405131db82a24d4ada4ae06bd.bin","bytes":15160846,"sha256":"ac13451227d4909a5c63c2bc10eb35095ebd70b405131db82a24d4ada4ae06bd"},{"path":"Build/b952f208ef655c8235a5dbad0fae6d20d27de24f8ad2e810d39696e4807eaee4/StarAbyss.raw.literal.c66d3ce06c7319578745491c845321fe1872f2b6e174e605c5d94b90ea66f162.bin","bytes":15009901,"sha256":"c66d3ce06c7319578745491c845321fe1872f2b6e174e605c5d94b90ea66f162"},{"path":"Build/c4993223e9c54698efec77210caa2113b92f5870cd153eea1ddf763e74cc9d10/StarAbyss-WebGL-WeChat.framework.js.unityweb","bytes":89531,"sha256":"9f08785f90a060087001f4a2dc69da23f5e0ff915f444020f55d1e0eb2b874b4"},{"path":"Build/c4993223e9c54698efec77210caa2113b92f5870cd153eea1ddf763e74cc9d10/StarAbyss-WebGL-WeChat.wasm.unityweb","bytes":5907453,"sha256":"fcec5e93c858833ef56c1f183d37148a72e66ea567c4d907cc4ca51051e411e7"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.aa","bytes":20971520,"sha256":"6c57bdfe318518616b12d7076606aa0bb93e98abee17384873a2f46d024c1c59"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ab","bytes":20971520,"sha256":"a1e10a21ce9568e6f728523cfdb49aecc0079277159a3f1a8f813682af55bac6"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ac","bytes":20971520,"sha256":"85b067932652248a400c5efafefb7369d8f832ba7758fc242fa1b13aceafa02b"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ad","bytes":20971520,"sha256":"55adf4a3f7acca002ba9a84954d69a99ef898f5900fb3c5d89c2be1c9d502462"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ae","bytes":20971520,"sha256":"12a5309dae7e2172aa4626e091d9d0900369dd5daa1bed84126282795bce089d"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.af","bytes":20971520,"sha256":"01f0e24d2bf51145aa3e1e0b9d4c491c6ef63a1a1dd0a1ccf7a1d233cb06a99f"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ag","bytes":20971520,"sha256":"6a7124d0722334eb4c0e8d91d23d8c7824632bd4b82dbabe3fb4011b74d95283"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ah","bytes":20971520,"sha256":"edeac23ae0a96b454bcf61617c51bf200dea910d3c72620be96487ec69b26d86"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ai","bytes":20971520,"sha256":"7482719130df6e57ed7d8ea9159e6fb8010a4b974481d1c84053482d5ae3d668"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.aj","bytes":20971520,"sha256":"ee385b78d653f64891849d221b97d810501185b5b9aaab0ceacdaad1fc6d6813"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.ak","bytes":20971520,"sha256":"3e3a5d142e1dd26fa9ddd0564c27ef365cf101249ae3713d6c067cffb25f82e4"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.al","bytes":20971520,"sha256":"96e79d4640f5cbf93b67187ff3f831061c558cfe1c589404152f829889e28bef"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.am","bytes":20971520,"sha256":"284ed664ad6325b4ada1ec6addb7e7fde558cec8bd3bf0810d54f4f1c28f4acf"},{"path":"Build/c5ae0326029bb868006ca43e80db8284f66ced318966920e2e138b919d442053/StarAbyss-WebGL-WeChat.data.part.an","bytes":14870332,"sha256":"640c781af2fde6712c66ad1fe39ea98f5113882d0332ce982a614dbf388b3f85"}],
+        fetchImpl: globalThis.fetch.bind(globalThis), onUpdate: state => { progressText.textContent = state.text; progressBar.style.width = state.percent + "%"; }
+      });
+      const readSource = loadingSupport.wrapReader(shipped.createPublicAssetReader({ baseUrl: new URL("./", window.location.href).href, allowLocalPreview: true, fetchImpl: loadingSupport.fetch }));
       try {
         for (const kind of ["wasm", "framework"]) {
           const plan = runtimeRecipes[kind];
           if (!plan) continue;
-          progressText.textContent = "载入 WebGL V161 · 校验程序";
+          loadingSupport.stage(kind === "wasm" ? "WASM程序" : "运行程序");
           const bytes = await shipped.reconstructRuntime(plan.recipe, { expectedOutput: plan.output, kind, readSource });
           const url = URL.createObjectURL(new Blob([bytes], { type: kind === "wasm" ? "application/wasm" : "application/javascript" }));
           reconstructedRuntimeUrls.push(url);
           config[kind === "wasm" ? "codeUrl" : "frameworkUrl"] = url;
         }
+        loadingSupport.stage("游戏");
         const raw = await shipped.reconstructData(dataRecipe.recipe, { expectedOutput: dataRecipe.output, readSource,
-          onProgress: state => {
-            const percent = state.phase === "complete" ? 55 : state.phase === "literal" ? 30 + Math.round(state.part / state.parts * 24) : Math.round(state.part / state.parts * 30);
-            progressBar.style.width = percent + "%";
-            progressText.textContent = "载入 WebGL V161 · " + percent + "%";
-          }
+          onProgress: state => loadingSupport.progress(state)
         });
         return URL.createObjectURL(new Blob([raw], { type: "application/octet-stream" }));
       } catch (error) {
@@ -188,7 +266,7 @@
         createUnityInstance(canvas, config, progress => {
           const percent = 55 + Math.round(progress * 45);
           progressBar.style.width = percent + "%";
-          progressText.textContent = "载入 WebGL V161 · " + percent + "%";
+          progressText.textContent = "初始化游戏 · " + Math.round(progress * 100) + "%";
         }).then(unityInstance => {
           URL.revokeObjectURL(config.dataUrl);
           for (const url of reconstructedRuntimeUrls) URL.revokeObjectURL(url);
