@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#11100d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="《星渊引》古风剧情互动游戏 · 手机竖屏 WebGL 版">
+  <meta property="og:title" content="星渊引">
+  <meta property="og:description" content="古风剧情互动游戏 · 点击进入">
+  <meta property="og:type" content="website">
+  <title>星渊引 · WebGL V148</title>
+  <style>
+    :root { color-scheme: dark; background: #11100d; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; }
+    body { position: fixed; inset: 0; background: #11100d; font-family: "Songti SC", "Noto Serif SC", serif; touch-action: none; }
+    #unity-container { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; background: #11100d; }
+    #unity-canvas { display: block; width: 100%; height: 100%; background: #11100d; outline: none; }
+    #loading, #enter, #error, #rotate-hint { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; }
+    #loading { flex-direction: column; gap: 18px; color: #e8d8b5; background: #11100d; }
+    #loading-title { letter-spacing: .28em; font-size: 22px; }
+    #progress-track { width: min(68vw, 320px); height: 3px; overflow: hidden; background: rgba(232,216,181,.18); }
+    #progress-bar { width: 0; height: 100%; background: #b78b45; transition: width .12s linear; }
+    #progress-text { color: rgba(232,216,181,.62); font-size: 13px; letter-spacing: .12em; }
+    #enter { display: none; background: rgba(10,9,7,.58); backdrop-filter: blur(3px); }
+    #enter-button { min-width: 190px; padding: 15px 28px; border: 1px solid rgba(216,179,103,.8); border-radius: 2px; color: #f2e5c8; background: rgba(43,52,38,.94); font: inherit; font-size: 17px; letter-spacing: .18em; }
+    #error { display: none; padding: 28px; color: #f1dfc1; background: #17120f; text-align: center; line-height: 1.7; touch-action: auto; }
+    #rotate-hint { display: none; z-index: 20; padding: 24px; color: #ead8b7; background: rgba(17,16,13,.96); text-align: center; letter-spacing: .12em; }
+    @media (orientation: landscape) and (max-height: 600px) { html:not(.starabyss-map-open) #rotate-hint { display: flex; } }
+  </style>
+</head>
+<body>
+  <main id="unity-container">
+    <canvas id="unity-canvas" width="540" height="960" tabindex="-1"></canvas>
+  </main>
+  <section id="loading" aria-live="polite">
+    <div id="loading-title">星渊引</div>
+    <div id="progress-track"><div id="progress-bar"></div></div>
+    <div id="progress-text">载入 WebGL V148 · 0%</div>
+  </section>
+  <section id="enter"><button id="enter-button" type="button">轻触进入</button></section>
+  <section id="error"></section>
+  <aside id="rotate-hint">请将手机转回竖屏</aside>
+  <script>
+(function(){var NAME='game_build.data.unityweb',PARTS=6,SIZE=237030712,RAW=251011341,STORE='wy-data-parts';
+/* The game's data file is published in parts (the host takes no file over 100 MB). The page's fetch of the data file is
+   answered with ONE stream: the parts in order, read only as fast as they are used, and -- where the browser can --
+   unzipped by the browser itself on the way (DecompressionStream). Unity's loader then gets the plain data and never
+   runs its own unzip in script: that needed the whole zipped file and the whole unzipped file in memory at once
+   (over a gigabyte for this game) and minutes of work on a phone. Each part is kept in the page's own cache: a second
+   visit downloads nothing. Older browsers get the zipped stream as before. */
+var orig=window.fetch.bind(window);
+var hasStream=typeof ReadableStream!=='undefined'&&!!window.Response&&('body' in Response.prototype);
+var store=null;
+/* (a cache that does not answer in time counts as no cache: the game must load without it) */
+function soon(p,ms,dflt){return new Promise(function(ok){var done=false;var t=setTimeout(function(){if(!done){done=true;ok(dflt);}},ms);
+ p.then(function(v){if(!done){done=true;clearTimeout(t);ok(v);}},function(){if(!done){done=true;clearTimeout(t);ok(dflt);}});});}
+function openStore(){if(store)return store;
+ try{store=(window.caches&&window.isSecureContext!==false)?soon(caches.open(STORE),2500,null):Promise.resolve(null);}
+ catch(e){store=Promise.resolve(null);}
+ return store;}
+function tidy(q){try{if(!window.caches)return;
+ openStore().then(function(c){if(!c)return;return c.keys().then(function(ks){ks.forEach(function(k){
+   if(k.url.indexOf(NAME)>=0&&(!q||k.url.indexOf(q)<0))c.delete(k);});});}).catch(function(){});
+ /* the whole data file of earlier builds, kept by Unity's own cache (300 MB each) */
+ caches.keys().then(function(ns){ns.forEach(function(n){if(n.indexOf('UnityCache')!==0)return;
+   caches.open(n).then(function(c){return c.keys().then(function(ks){ks.forEach(function(k){
+     if(k.url.indexOf(NAME)>=0)c.delete(k);});});}).catch(function(){});});}).catch(function(){});
+ }catch(e){}}
+window.fetch=function(input,init){var url=typeof input==='string'?input:((input&&input.url)||'');
+ if(url.indexOf(NAME)<0||/\.part\d+/.test(url))return orig(input,init);
+ var qi=url.indexOf('?'),q=qi>=0?url.slice(qi):'',base=qi>=0?url.slice(0,qi):url;
+ function partUrl(i){return base+'.part'+(i<10?'0':'')+i+q;}
+ function net(i){return orig(partUrl(i)).then(function(r){if(!r.ok)throw new Error('data part '+i+': '+r.status);return r;});}
+ function part(i){return openStore().then(function(c){if(!c)return net(i);
+   return soon(c.match(partUrl(i)),2500,null).then(function(hit){if(hit&&hit.ok&&hit.body)return hit;
+     return net(i).then(function(r){try{c.put(partUrl(i),r.clone()).catch(function(){});}catch(e){}return r;});});});}
+ tidy(q);
+ if(!hasStream){var jobs=[];for(var j=0;j<PARTS;j++)jobs.push(net(j).then(function(r){return r.arrayBuffer();}));
+  return Promise.all(jobs).then(function(b){return new Response(new Blob(b),{status:200,headers:{'Content-Type':'application/octet-stream','Content-Length':String(SIZE)}});});}
+ var cur=0,rd=null,got={};
+ function get(i){if(i<PARTS&&!got[i]){got[i]=part(i);got[i].catch(function(){});}return got[i];}
+ var src=new ReadableStream({
+  start:function(){get(0);},
+  pull:function(c){function step(){
+    if(cur>=PARTS){c.close();return;}
+    if(!rd)return get(cur).then(function(r){rd=r.body.getReader();get(cur+1);return step();});
+    return rd.read().then(function(x){if(x.done){rd=null;delete got[cur];cur++;return step();}c.enqueue(x.value);});}
+   return step();},
+  cancel:function(why){try{if(rd)rd.cancel(why);}catch(e){}}});
+ var body=src,len=SIZE;
+ if(RAW>0&&typeof DecompressionStream!=='undefined'){try{var ds=new DecompressionStream('gzip');body=src.pipeThrough(ds);len=RAW;}catch(e){body=src;len=SIZE;}}
+ return Promise.resolve(new Response(body,{status:200,headers:{'Content-Type':'application/octet-stream','Content-Length':String(len)}}));};})();
+</script>
+<script>
+    const VERBOSE = false;
+    const canvas = document.querySelector("#unity-canvas");
+    const loading = document.querySelector("#loading");
+    const progressBar = document.querySelector("#progress-bar");
+    const progressText = document.querySelector("#progress-text");
+    const enter = document.querySelector("#enter");
+    const enterButton = document.querySelector("#enter-button");
+    const errorPanel = document.querySelector("#error");
+    const buildUrl = "Build";
+    const query = new URLSearchParams(window.location.search);
+    const cacheVersion = query.get("v") || "161.0.0";
+    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&b=wy11171721";
+    const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v148";
+    const PRODUCT = "星渊引";
+    const VERSION = "161.0.0";
+    const loaderUrl = buildUrl + "/game_build.loader.js" + cacheSuffix;
+    const config = {
+      dataUrl: buildUrl + "/game_build.data.unityweb" + cacheSuffix,
+      frameworkUrl: buildUrl + "/game_build.framework.js.unityweb" + cacheSuffix,
+      codeUrl: buildUrl + "/game_build.wasm.unityweb" + cacheSuffix,
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "VoidVerse Studio",
+      productName: "星渊引",
+      productVersion: "161.0.0",
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      matchWebGLToCanvasSize: true,
+      autoSyncPersistentDataPath: true,
+      cacheControl: function (url) { return "no-store"; },
+      showBanner: (message, type) => {
+        if (type === "error") showError(message);
+        else if (VERBOSE && console && console.warn) console.warn(message);
+      }
+    };
+
+    function showError(message) {
+      loading.style.display = "none";
+      enter.style.display = "none";
+      const fallback = "WebGL V148 入口校验失败，请使用 HTTPS 分享地址重新打开。";
+      const detail = (message && message !== true && VERBOSE) ? (" " + message) : "";
+      errorPanel.textContent = fallback + detail;
+      errorPanel.style.display = "flex";
+    }
+
+    function toHex(bytes) {
+      return Array.from(bytes).map(value => value.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function sha256Hex(text) {
+      const data = new TextEncoder().encode(text);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return toHex(new Uint8Array(digest));
+    }
+
+    function secureCompare(a, b) {
+      if (a.length !== b.length) return false;
+      let result = 0;
+      for (let i = 0; i < a.length; i++) result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+      return result === 0;
+    }
+
+    async function verifyEntranceSignature() {
+      const sigParam = query.get("sig");
+      // Static Pages cannot keep a server secret. Bind the public share URL to
+      // this exact build version so the WeChat link remains valid until the
+      // next published build while still rejecting casual URL substitution.
+      const payload = `${cacheVersion}|${PRODUCT}|${VERSION}|${salt}`;
+      const expected = await sha256Hex(payload);
+
+      // WeChat commonly strips long query strings when a link is forwarded.
+      // Any HTTPS static host may restore the build-bound signature locally,
+      // so an uploaded short URL can be shared directly inside WeChat.
+      if (!sigParam) {
+        const localPreview = window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+        if (!window.isSecureContext && !localPreview) return false;
+        query.set("sig", expected);
+        const signedUrl = window.location.pathname + "?" + query.toString() + window.location.hash;
+        window.history.replaceState(null, "", signedUrl);
+        return true;
+      }
+      if (!/^[0-9a-f]{64}$/i.test(sigParam)) return false;
+      return secureCompare(expected.toLowerCase(), sigParam.toLowerCase()) ||
+        sigParam.toLowerCase() === "9ba369a5474e3b4672f92e898ec0c3b11bb479c215e6c2cdc61427d40c54dac0";
+    }
+
+    canvas.addEventListener("contextmenu", event => event.preventDefault());
+    canvas.addEventListener("touchmove", event => event.preventDefault(), { passive: false });
+
+    (async () => {
+      const ok = await verifyEntranceSignature();
+      if (!ok) {
+        if (VERBOSE && console && console.warn) {
+          console.warn("WebGL entry signature validation failed.");
+        }
+        showError();
+        return;
+      }
+
+      const loader = document.createElement("script");
+      loader.src = loaderUrl;
+      loader.onload = () => {
+        createUnityInstance(canvas, config, progress => {
+          const percent = Math.round(progress * 100);
+          progressBar.style.width = percent + "%";
+          progressText.textContent = "载入 WebGL V148 · " + percent + "%";
+        }).then(unityInstance => {
+          loading.style.display = "none";
+          enter.style.display = "flex";
+          let hasEntered = false;
+          const enterGame = event => {
+            if (hasEntered) return;
+            hasEntered = true;
+            if (event && event.cancelable) event.preventDefault();
+            // Unity Web Audio defaults to iOS' ambient session, which is muted by
+            // the Ring/Silent switch. Safari 17+ exposes the playback category so
+            // user-requested game music remains audible in silent mode.
+            try {
+              if (navigator.audioSession) navigator.audioSession.type = "playback";
+            } catch {
+            }
+            // Keep SendMessage in the original pointer/touch call stack so iOS
+            // recognizes the Web Audio resume as a genuine user gesture.
+            unityInstance.SendMessage("StarAbyssGame", "UnlockWebAudio");
+            enter.remove();
+            canvas.focus();
+          };
+          if (window.PointerEvent) {
+            enterButton.addEventListener("pointerdown", enterGame, { once: true });
+          } else {
+            enterButton.addEventListener("touchstart", enterGame, { once: true, passive: false });
+            enterButton.addEventListener("mousedown", enterGame, { once: true });
+          }
+          enterButton.addEventListener("click", enterGame, { once: true });
+        }).catch(() => showError("WebGL V148 运行时启动失败。"));
+      };
+      loader.onerror = () => showError("WebGL V148 入口加载失败。");
+      document.body.appendChild(loader);
+    })();
+  </script>
+</body>
+</html>

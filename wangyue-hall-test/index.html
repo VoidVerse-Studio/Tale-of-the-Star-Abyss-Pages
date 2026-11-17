@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>望月轩 · 大厅背景试玩</title>
+<style>
+html,body{margin:0;height:100%;background:#11100d;overflow:hidden;touch-action:none}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#unity-canvas{display:block;background:#11100d;outline:none}
+#msg{position:fixed;left:0;right:0;top:45%;text-align:center;color:#e8d8b5;font:16px/1.6 serif;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="unity-canvas" tabindex="-1"></canvas></div>
+<div id="msg">载入中…</div>
+<script src="Build/WangyueHallTest.loader.js"></script>
+<script>
+var canvas=document.querySelector('#unity-canvas'),msg=document.querySelector('#msg');
+function fit(){var w=window.innerWidth,h=window.innerHeight,a=9/16;var cw=w,ch=h;if(w/h>a*1.35){cw=Math.round(h*a*1.35);}canvas.style.width=cw+'px';canvas.style.height=ch+'px';}
+fit();window.addEventListener('resize',fit);
+createUnityInstance(canvas,{dataUrl:'Build/WangyueHallTest.data.unityweb',frameworkUrl:'Build/WangyueHallTest.framework.js.unityweb',codeUrl:'Build/WangyueHallTest.wasm.unityweb',
+ streamingAssetsUrl:'StreamingAssets',companyName:'VoidVerse Studio',productName:'WangyueHallTest',productVersion:'0.1',
+ devicePixelRatio:Math.min(window.devicePixelRatio||1,2),matchWebGLToCanvasSize:true},
+ function(p){msg.textContent='载入中… '+Math.round(p*100)+'%';})
+.then(function(){msg.style.display='none';}).catch(function(e){msg.textContent='载入失败：'+e;});
+canvas.addEventListener('contextmenu',function(e){e.preventDefault();});
+</script>
+</body>
+</html>
