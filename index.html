@@ -109,7 +109,7 @@
   <section id="error"></section>
   <aside id="rotate-hint">请将手机转回竖屏</aside>
   <script>
-(function(){var NAME='game_build.data.unityweb',PARTS=9,SIZE=373740599,RAW=399404012,STORE='wy-data-parts';
+(function(){var NAME='game_build.data.unityweb',PARTS=9,SIZE=373741831,RAW=399406408,STORE='wy-data-parts';
 /* The game's data file is published in parts (the host takes no file over 100 MB). The page's fetch of the data file is
    answered with ONE stream: the parts in order, read only as fast as they are used, and -- where the browser can --
    unzipped by the browser itself on the way (DecompressionStream). Unity's loader then gets the plain data and never
@@ -171,7 +171,7 @@ window.fetch=function(input,init){var url=typeof input==='string'?input:((input&
     const buildUrl = "Build";
     const query = new URLSearchParams(window.location.search);
     const cacheVersion = query.get("v") || "161.0.0";
-    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&b=wy11210004";
+    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&b=wy11210211";
     const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v148";
     const PRODUCT = "星渊引";
     const VERSION = "161.0.0";
@@ -266,7 +266,7 @@ window.fetch=function(input,init){var url=typeof input==='string'?input:((input&
           progressBar.style.width = percent + "%";
           progressText.textContent = percent + "%";
         }).then(unityInstance => {
-          const wyGate = function () { if (wyGate.done) return; wyGate.done = true; try { unityInstance.SendMessage("WYMoonTitle", "Tune", "flowery=36"); } catch (e) {} loading.classList.add("wy-ready"); enter.style.display = "flex"; };
+          const wyGate = function () { if (wyGate.done) return; wyGate.done = true; loading.classList.add("wy-ready"); enter.style.display = "flex"; };
           if (window.__wyTitleReady) wyGate(); else { window.addEventListener("wy-title-ready", wyGate, { once: true }); setTimeout(wyGate, 12000); }
           let hasEntered = false;
           const enterGame = event => {
