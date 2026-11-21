@@ -35,6 +35,8 @@
     :root { background: #0c0a1c; }
     body, #unity-container, #unity-canvas { background: #0c0a1c; }
     #loading { overflow: hidden; gap: 0; color: #f0deb4; background: #0c0a1c; transition: opacity .7s ease; }
+    /* the way in was touched: both go at once (still in the way of the finger until they are taken away). #enter's own
+       fade-in animation keeps its last frame, which would hold it fully shown over this: it is switched off here. */
     #loading.wy-out { opacity: 0; transition: opacity .26s ease-out; }
     #enter.wy-out { opacity: 0 !important; animation: none !important; transition: opacity .14s ease-out; }
     #progress-track, #loading .wy-line { transition: opacity .45s ease; }
@@ -107,7 +109,7 @@
   <section id="error"></section>
   <aside id="rotate-hint">请将手机转回竖屏</aside>
   <script>
-(function(){var NAME='game_build.data.unityweb',PARTS=9,SIZE=371950865,RAW=397562192,STORE='wy-data-parts';
+(function(){var NAME='game_build.data.unityweb',PARTS=9,SIZE=373740599,RAW=399404012,STORE='wy-data-parts';
 /* The game's data file is published in parts (the host takes no file over 100 MB). The page's fetch of the data file is
    answered with ONE stream: the parts in order, read only as fast as they are used, and -- where the browser can --
    unzipped by the browser itself on the way (DecompressionStream). Unity's loader then gets the plain data and never
@@ -169,7 +171,7 @@ window.fetch=function(input,init){var url=typeof input==='string'?input:((input&
     const buildUrl = "Build";
     const query = new URLSearchParams(window.location.search);
     const cacheVersion = query.get("v") || "161.0.0";
-    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&b=wy11202350";
+    const cacheSuffix = "?v=" + encodeURIComponent(cacheVersion) + "&b=wy11210004";
     const salt = window.__ENTRY_SALT__ || "starabyss-mobile-entry-v148";
     const PRODUCT = "星渊引";
     const VERSION = "161.0.0";
@@ -264,7 +266,7 @@ window.fetch=function(input,init){var url=typeof input==='string'?input:((input&
           progressBar.style.width = percent + "%";
           progressText.textContent = percent + "%";
         }).then(unityInstance => {
-          const wyGate = function () { if (wyGate.done) return; wyGate.done = true; loading.classList.add("wy-ready"); enter.style.display = "flex"; };
+          const wyGate = function () { if (wyGate.done) return; wyGate.done = true; try { unityInstance.SendMessage("WYMoonTitle", "Tune", "flowery=36"); } catch (e) {} loading.classList.add("wy-ready"); enter.style.display = "flex"; };
           if (window.__wyTitleReady) wyGate(); else { window.addEventListener("wy-title-ready", wyGate, { once: true }); setTimeout(wyGate, 12000); }
           let hasEntered = false;
           const enterGame = event => {
@@ -280,6 +282,7 @@ window.fetch=function(input,init){var url=typeof input==='string'?input:((input&
             }
             // Keep SendMessage in the original pointer/touch call stack so iOS
             // recognizes the Web Audio resume as a genuine user gesture.
+            
             enter.classList.add("wy-out"); loading.classList.add("wy-out");
             const wyTell = function () { try { unityInstance.SendMessage("StarAbyssGame", "UnlockWebAudio"); } catch (e) {} try { unityInstance.SendMessage("WYPage", "Entered"); } catch (e) {} };
             if (window.requestAnimationFrame) requestAnimationFrame(function () { setTimeout(wyTell, 0); }); else setTimeout(wyTell, 30);
